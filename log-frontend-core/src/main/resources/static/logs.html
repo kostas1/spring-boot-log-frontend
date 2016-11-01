@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello WebSocket</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        var stompClient = null;
+        var existing = [];
+
+
+        function append(line) {
+            var l = document.createElement("p");
+            l.innerHTML = line;
+            document.getElementById("logs").appendChild(l);
+        }
+
+
+        function connect() {
+
+            existing.forEach(append);
+            var socket = new SockJS('/logs');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/logs', function(log) {
+                    append(log.body);
+                    console.log(log);
+                });
+            });
+        }
+
+    </script>
+</head>
+<body onload="connect()">
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div>
+    <div id="logs">
+
+    </div>
+</div>
+</body>
+</html>
